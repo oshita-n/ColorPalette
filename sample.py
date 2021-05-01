@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import collections
 
-mask = cv2.imread("abema.jpg")
+mask = cv2.imread("abema.png")
 mask_arr = []
 for i in range(len(mask)):
     for j in range(len(mask[0])):
