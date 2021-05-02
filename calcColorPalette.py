@@ -59,7 +59,7 @@ def calcColor(mask):
     cv2.rectangle(img, (150, 0), (200, 50),  (int(score_sorted[3][0][0]),int(score_sorted[3][0][1]),int(score_sorted[3][0][2])),-1)
     return img
 
-mask = cv2.imread("timee.png")
+mask = cv2.imread("seven.png")
 mask = posterization(mask)
 img = calcColor(mask)
 cv2.imwrite("colorpalette.jpg", img)
