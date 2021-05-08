@@ -31,7 +31,7 @@ def calcColor(mask):
     pop_list = []
 
     # 色の取捨選択のための閾値
-    thresh = 30
+    thresh = 5
     # 色の取捨選択
     for i in range(len(score_sorted)-1):
         if abs(int(score_sorted[i][0][0]) - int(score_sorted[i+1][0][0])) >= 0 and abs(int(score_sorted[i][0][0]) - int(score_sorted[i+1][0][0])) <= thresh:
@@ -105,9 +105,10 @@ def calcColor8(mask):
     cv2.rectangle(img, (350, 0), (400, 50),  (int(score_sorted[7][0][0]),int(score_sorted[7][0][1]),int(score_sorted[7][0][2])),-1)
     return img
 
-mask = cv2.imread("rakuten.png")
+mask = cv2.imread("./art/nikkei.png")
 mask = posterization(mask)
 img = calcColor(mask)
 img8 = calcColor8(mask)
-cv2.imwrite("colorpalette.jpg", img)
-cv2.imwrite("colorpalette8.jpg", img8)
+cv2.imwrite("posterize.png", mask)
+cv2.imwrite("colorpalette.png", img)
+cv2.imwrite("colorpalette8.png", img8)
