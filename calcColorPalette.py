@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import collections
+import timeit
 
 def posterization(frame, step = 4):
     if 1 < step and step <= 256:
@@ -17,6 +18,7 @@ def posterization(frame, step = 4):
         return frame
 
 def calcColor(mask):
+    # 各色をカウントする
     mask_arr = []
     for i in range(len(mask)):
         for j in range(len(mask[0])):
@@ -58,24 +60,29 @@ def calcColor(mask):
     cv2.rectangle(img, (100, 0), (150, 50),  (int(score_sorted[2][0][0]),int(score_sorted[2][0][1]),int(score_sorted[2][0][2])),-1)
     cv2.rectangle(img, (150, 0), (200, 50),  (int(score_sorted[3][0][0]),int(score_sorted[3][0][1]),int(score_sorted[3][0][2])),-1)
     return img
-def calcColor8(mask):
-    mask_arr = []
-    for i in range(len(mask)):
-        for j in range(len(mask[0])):
-            mask_arr.append(mask[i][j])
-    count = collections.Counter(map(tuple, mask_arr))
+
+def calcColor_llist(mask):
+    # 各色をカウントする
+    mask_llist = collections.deque()
+    # for i in range(len(mask)):
+    #     for j in range(len(mask[0])):
+    #         mask_llist.append(mask[i][j])
+    mask_llist = [mask[i][j] for i in range(len(mask)) for j in range(len(mask[0]))]
+    count = collections.Counter(map(tuple, mask_llist))
     score_sorted = sorted(count.items(), key=lambda x: -x[1])
 
     flag1 = False
     flag2 = False
     flag3 = False
 
-    pop_list = []
+    # pop_list = []
 
     # 色の取捨選択のための閾値
     thresh = 30
-    # 色の取捨選択
-    for i in range(len(score_sorted)-1):
+    # 色の取捨選択(RGBだから3色ごとに色の近さを計測)
+    # 隣の色との近さを計測
+    # 厳密に隣の色を計測する必要はないので20px離れたところを計測する
+    for i in range(0, len(score_sorted)-1, 20):
         if abs(int(score_sorted[i][0][0]) - int(score_sorted[i+1][0][0])) >= 0 and abs(int(score_sorted[i][0][0]) - int(score_sorted[i+1][0][0])) <= thresh:
             flag1 = True
         if abs(int(score_sorted[i][0][1]) - int(score_sorted[i+1][0][1])) >= 0 and abs(int(score_sorted[i][0][1]) - int(score_sorted[i+1][0][1])) <= thresh:
@@ -84,30 +91,31 @@ def calcColor8(mask):
             flag3 = True
         
         if flag1 == True and flag2 == True and flag3 ==True:
-            pop_list.append(i)
+            mask_llist.pop(i)
 
         flag1 = False
         flag2 = False
         flag3 = False
 
-    for i in sorted(set(pop_list), reverse=True):
-        score_sorted.pop(i)
+    # for i in sorted(set(pop_list), reverse=True):
+    #     score_sorted.pop(i)
 
-    print(score_sorted[0:8])
-    img = np.full((50, 400, 3), 128, dtype=np.uint8)
+    print(score_sorted[0:4])
+    img = np.full((50, 200, 3), 128, dtype=np.uint8)
     cv2.rectangle(img, (0, 0), (50, 50), (int(score_sorted[0][0][0]),int(score_sorted[0][0][1]),int(score_sorted[0][0][2])), -1)
     cv2.rectangle(img, (50, 0), (100, 50),  (int(score_sorted[1][0][0]),int(score_sorted[1][0][1]),int(score_sorted[1][0][2])), -1)
     cv2.rectangle(img, (100, 0), (150, 50),  (int(score_sorted[2][0][0]),int(score_sorted[2][0][1]),int(score_sorted[2][0][2])),-1)
     cv2.rectangle(img, (150, 0), (200, 50),  (int(score_sorted[3][0][0]),int(score_sorted[3][0][1]),int(score_sorted[3][0][2])),-1)
-    cv2.rectangle(img, (200, 0), (250, 50), (int(score_sorted[4][0][0]),int(score_sorted[4][0][1]),int(score_sorted[4][0][2])), -1)
-    cv2.rectangle(img, (250, 0), (300, 50),  (int(score_sorted[5][0][0]),int(score_sorted[5][0][1]),int(score_sorted[5][0][2])), -1)
-    cv2.rectangle(img, (300, 0), (350, 50),  (int(score_sorted[6][0][0]),int(score_sorted[6][0][1]),int(score_sorted[6][0][2])),-1)
-    cv2.rectangle(img, (350, 0), (400, 50),  (int(score_sorted[7][0][0]),int(score_sorted[7][0][1]),int(score_sorted[7][0][2])),-1)
     return img
 
 mask = cv2.imread("rakuten.png")
-mask = posterization(mask)
-img = calcColor(mask)
-img8 = calcColor8(mask)
+mask = posterization(mask, step=6)
+# img = calcColor(mask)
+img = calcColor_llist(mask)
+# 1000回実行を繰り返した秒数
+# t1 = timeit.timeit('calcColor(mask)', number=10, globals=globals())
+# t2 = timeit.timeit('calcColor_llist(mask)', number=10, globals=globals())
+
+# print("t1, for loop: %.3f sec" % t1)
+# print("t2, for loop: %.3f sec" % t2)
 cv2.imwrite("colorpalette.jpg", img)
-cv2.imwrite("colorpalette8.jpg", img8)
