@@ -33,7 +33,7 @@ def calcColor(mask):
     pop_list = []
 
     # 色の取捨選択のための閾値
-    thresh = 30
+    thresh = 5
     # 色の取捨選択
     for i in range(len(score_sorted)-1):
         if abs(int(score_sorted[i][0][0]) - int(score_sorted[i+1][0][0])) >= 0 and abs(int(score_sorted[i][0][0]) - int(score_sorted[i+1][0][0])) <= thresh:
