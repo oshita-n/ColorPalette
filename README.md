@@ -1,6 +1,6 @@
 # 画像からカラーパレットを取得します
 
- ![seven_cp](seven_cp.png)
+ ![seven_cp](art/seven_cp.png)
 
  ## 使い方
 
