@@ -3,7 +3,7 @@ import cv2
 import collections
 import timeit
 
-def posterization(frame, step = 4):
+def posterization(frame: np.ndarray, step = 4):
     if 1 < step and step <= 256:
         look_up_table = np.zeros((256, 1), dtype = 'uint8')
         split = int(256 / (step - 1))
@@ -17,7 +17,7 @@ def posterization(frame, step = 4):
     else:
         return frame
 
-def calcColor(mask):
+def calcColor(mask: np.ndarray):
     # 各色をカウントする
     mask_arr = []
     for i in range(len(mask)):
@@ -61,7 +61,7 @@ def calcColor(mask):
     cv2.rectangle(img, (150, 0), (200, 50),  (int(score_sorted[3][0][0]),int(score_sorted[3][0][1]),int(score_sorted[3][0][2])),-1)
     return img
 
-def calcColor_llist(mask):
+def calcColor_llist(mask: np.ndarray):
     # 各色をカウントする
     mask_llist = collections.deque()
     # for i in range(len(mask)):
@@ -109,14 +109,6 @@ def calcColor_llist(mask):
     return img
 
 mask = cv2.imread("art/paypay2.png")
-print(type(mask))
 mask = posterization(mask, step=4)
-# img = calcColor(mask)
 img = calcColor_llist(mask)
-# 1000回実行を繰り返した秒数
-# t1 = timeit.timeit('calcColor(mask)', number=10, globals=globals())
-# t2 = timeit.timeit('calcColor_llist(mask)', number=10, globals=globals())
-
-# print("t1, for loop: %.3f sec" % t1)
-# print("t2, for loop: %.3f sec" % t2)
 cv2.imwrite("colorpalette.jpg", img)
