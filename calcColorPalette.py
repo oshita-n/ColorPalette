@@ -78,7 +78,7 @@ def calcColor_llist(mask):
     # pop_list = []
 
     # 色の取捨選択のための閾値
-    thresh = 30
+    thresh = 10
     # 色の取捨選択(RGBだから3色ごとに色の近さを計測)
     # 隣の色との近さを計測
     # 厳密に隣の色を計測する必要はないので20px離れたところを計測する
@@ -108,8 +108,9 @@ def calcColor_llist(mask):
     cv2.rectangle(img, (150, 0), (200, 50),  (int(score_sorted[3][0][0]),int(score_sorted[3][0][1]),int(score_sorted[3][0][2])),-1)
     return img
 
-mask = cv2.imread("rakuten.png")
-mask = posterization(mask, step=6)
+mask = cv2.imread("art/paypay2.png")
+print(type(mask))
+mask = posterization(mask, step=4)
 # img = calcColor(mask)
 img = calcColor_llist(mask)
 # 1000回実行を繰り返した秒数
